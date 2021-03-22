@@ -6,7 +6,11 @@ const { MongoClient } = mongo;
 
 const url = process.env.MONGO_URL;
 
-export const client = new MongoClient(url, { useNewUrlParser: true });
+export const client = new MongoClient(url, {
+  useNewUrlParser: true,
+  // fix deprecation error
+  useUnifiedTopology: true,
+});
 
 export async function connectDb() {
   try {
