@@ -1,13 +1,19 @@
+import "./env.js";
+// this import has to be at the very top of the root file
+// this kind of import, imports the file and runs it immediately
+
 // fastify is the server library from https://www.fastify.io/
 import { fastify } from "fastify";
 // fastify-static is a plugin that makes hosting a static file directory very easy
-import fastifyClassic from "fastify-static";
+import fastifyStatic from "fastify-static";
 
 // while __dirname and __filename are usually a default in node
 // with ESM you have to make them yourself.
 // Feature, not a bug
 import path from "path";
 import { fileURLToPath } from "url";
+
+import { connectDb } from "./db.js";
 
 // import meta allows us to get metadata about our files
 const __filename = fileURLToPath(import.meta.url);
@@ -16,11 +22,14 @@ const __dirname = path.dirname(__filename);
 // create our app with fastify
 const app = fastify();
 
+// this doesn't seem to work with nodemon?
+// console.log("We on?: ", process.env.MONGO_URL);
+
 async function startApp() {
   try {
     // registers the static file directory
     // as the current directory { __dirname } with the "public" folder inside of it
-    app.register(fastifyClassic, {
+    app.register(fastifyStatic, {
       root: path.join(__dirname, "public"),
     });
 
@@ -41,4 +50,7 @@ async function startApp() {
 // why wrap the app start in an asyn/await?
 // we will need to wait for out database to
 // start up before we start the app
-startApp();
+
+connectDb().then(() => {
+  startApp();
+});
