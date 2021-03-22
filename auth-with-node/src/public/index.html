@@ -8,5 +8,34 @@
   </head>
   <body>
     <h1>Hello from the web!</h1>
+
+    <h3>Register Form</h3>
+
+    <!-- TIP: in VSCode try using emmet form>input+input+button -->
+    <form id="registration-form">
+      <input type="email" name="email" />
+      <input type="password" name="password" />
+      <button type="submit">Register</button>
+    </form>
+
+    <script>
+      // Immediately Invoked Function Expression
+      // https://codeburst.io/javascript-what-the-heck-is-an-immediately-invoked-function-expression-a0ed32b66c18
+      (() => {
+        // this looks for the element with registration form and assigns it
+        const form = document.getElementById("registration-form");
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const values = Object.values(form).reduce((obj, field) => {
+            if (field.name) {
+              obj[field.name] = field.value;
+            }
+            return obj;
+          }, {});
+          console.log(values);
+        });
+        // this empty bracket runs our function
+      })();
+    </script>
   </body>
 </html>
