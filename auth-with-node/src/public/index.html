@@ -18,21 +18,69 @@
       <button type="submit">Register</button>
     </form>
 
+    <br />
+    <br />
+    <br />
+    <h3>Login Form</h3>
+
+    <form id="login-form">
+      <input type="email" name="email" />
+      <input type="password" name="password" />
+      <button type="submit">Login</button>
+    </form>
+
     <script>
       // Immediately Invoked Function Expression
       // https://codeburst.io/javascript-what-the-heck-is-an-immediately-invoked-function-expression-a0ed32b66c18
       (() => {
         // this looks for the element with registration form and assigns it
-        const form = document.getElementById("registration-form");
-        form.addEventListener("submit", (e) => {
+        const registrationForm = document.getElementById("registration-form");
+        registrationForm.addEventListener("submit", async (e) => {
           e.preventDefault();
-          const values = Object.values(form).reduce((obj, field) => {
-            if (field.name) {
-              obj[field.name] = field.value;
-            }
-            return obj;
-          }, {});
-          console.log(values);
+          try {
+            const values = Object.values(registrationForm).reduce(
+              (obj, field) => {
+                if (field.name) {
+                  obj[field.name] = field.value;
+                }
+                return obj;
+              },
+              {}
+            );
+
+            console.log(values);
+
+            const res = await fetch("/api/register", {
+              method: "POST",
+              body: JSON.stringify(values),
+              headers: { "Content-type": "application/json; charset=UTF-8" },
+            });
+          } catch (error) {
+            console.log(error);
+          }
+        });
+
+        const authorizeForm = document.getElementById("login-form");
+        authorizeForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          try {
+            const values = Object.values(authorizeForm).reduce((obj, field) => {
+              if (field.name) {
+                obj[field.name] = field.value;
+              }
+              return obj;
+            }, {});
+
+            console.log(values);
+
+            const res = await fetch("/api/authorize", {
+              method: "POST",
+              body: JSON.stringify(values),
+              headers: { "Content-type": "application/json; charset=UTF-8" },
+            });
+          } catch (error) {
+            console.log(error);
+          }
         });
         // this empty bracket runs our function
       })();
