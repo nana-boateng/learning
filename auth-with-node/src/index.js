@@ -17,6 +17,7 @@ import { fileURLToPath } from "url";
 import { registerUser } from "./accounts/register.js";
 import { authorizeUser } from "./accounts/authorize.js";
 import { signUserIn } from "./accounts/signUserIn.js";
+import { getUserFromCookies } from "./accounts/user.js";
 
 import { connectDb } from "./db.js";
 
@@ -77,11 +78,22 @@ async function startApp() {
       }
     });
 
-    app.get("/test", {}, (request, reply) => {
-      console.log(request.cookies);
-      reply.send({
-        data: "👨👨‍👨👨👨🦳",
-      });
+    // this test route helps us debug and test requests
+    app.get("/test", {}, async (request, reply) => {
+      try {
+        // verify user login
+        const user = await getUserFromCookies(request, reply);
+        // if user email, return else return unathorize
+        if (user) {
+          reply.send(user);
+        } else {
+          reply.send({
+            data: "User lookup failed...",
+          });
+        }
+      } catch (error) {
+        console.error(error);
+      }
     });
 
     // return "Hello again" when you visit localhost:3000/say-hi
