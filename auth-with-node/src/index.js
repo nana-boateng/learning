@@ -78,7 +78,7 @@ async function startApp() {
     });
 
     app.get("/test", {}, (request, reply) => {
-      console.log(request.cookies.testCookie);
+      console.log(request.cookies);
       reply.send({
         data: "👨👨‍👨👨👨🦳",
       });
