@@ -17,6 +17,7 @@ import { fileURLToPath } from "url";
 import { registerUser } from "./accounts/register.js";
 import { authorizeUser } from "./accounts/authorize.js";
 import { signUserIn } from "./accounts/signUserIn.js";
+import { signUserOut } from "./accounts/signUserOut.js";
 import { getUserFromCookies } from "./accounts/user.js";
 
 import { connectDb } from "./db.js";
@@ -33,13 +34,12 @@ const app = fastify();
 
 async function startApp() {
   try {
-    // registers the static file directory
-    // as the current directory { __dirname } with the "public" folder inside of it
-
     app.register(fastifyCookie, {
       secret: process.env.COOKIE_SIGNATURE,
     });
 
+    // registers the static file directory
+    // as the current directory { __dirname } with the "public" folder inside of it
     app.register(fastifyStatic, {
       root: path.join(__dirname, "public"),
     });
@@ -50,8 +50,22 @@ async function startApp() {
           request.body.email,
           request.body.password
         );
+        // if user is able to register, sign them in immediately
+        if (userId) {
+          await signUserIn(userId, request, reply);
+          reply.send({
+            data: {
+              status: "success",
+            },
+          });
+        }
       } catch (error) {
         console.log(error);
+        reply.send({
+          data: {
+            status: "failed",
+          },
+        });
       }
     });
 
@@ -66,13 +80,25 @@ async function startApp() {
           // set cookies
           await signUserIn(userId, request, reply);
           reply.send({
-            data: "Success!",
-          });
-        } else {
-          reply.send({
-            data: "auth-fail",
+            data: {
+              status: "success",
+            },
           });
         }
+      } catch (error) {
+        console.log(error);
+        reply.send({
+          data: {
+            status: "failed",
+          },
+        });
+      }
+    });
+
+    app.post("/api/logout", {}, async (request, reply) => {
+      try {
+        await signUserOut(request, reply);
+        reply.send({ data: "User signed out" });
       } catch (error) {
         console.log(error);
       }
