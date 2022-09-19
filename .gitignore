@@ -1,2 +1,2 @@
-/auth-with-node/node_modules
+node_modules/
 auth-with-node/.env
